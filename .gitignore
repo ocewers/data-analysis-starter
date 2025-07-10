@@ -1,11 +1,32 @@
-# Ignore Python build artifacts
+# Byte-compiled / cache files
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.so
 
-# Ignore Python distribution artifacts
-dist/
-build/
-*.egg-info/
-*.egg
+# Virtual environments
+.venv/
+env/
+venv/
+*.env
+
+# Data files
+*.csv
+*.tsv
+*.xls
+*.xlsx
+*.parquet
+*.h5
+*.sqlite3
+*.db
+
+# Ignore all files in data/
+data/**
+
+# Logs
+*.log
+
+# Mac / Linux / Windows system files
+.DS_Store
+Thumbs.db
