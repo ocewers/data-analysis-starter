@@ -40,3 +40,6 @@ data/**
 # Mac / Linux / Windows system files
 .DS_Store
 Thumbs.db
+
+# uv-lock file
+uv.lock
