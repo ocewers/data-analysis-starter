@@ -5,8 +5,8 @@
 import sys
 from pathlib import Path
 
-SUBDIRECTORY_LEVEL = 1  # Adjust this if the structure changes
-sys.path.append(str(Path(__file__).resolve().parents[SUBDIRECTORY_LEVEL]))
+ROOT_LEVELS_UP = 1  # Adjust this if the structure changes
+sys.path.append(str(Path(__file__).resolve().parents[ROOT_LEVELS_UP]))
 import config
 
 

@@ -4,8 +4,8 @@ import tempfile
 from pathlib import Path
 import pytest
 
-SUBDIRECTORY_LEVEL = 1  # Adjust this if the structure changes
-sys.path.append(str(Path(__file__).resolve().parents[SUBDIRECTORY_LEVEL]))
+ROOT_LEVELS_UP = 1  # Adjust this if the structure changes
+sys.path.append(str(Path(__file__).resolve().parents[ROOT_LEVELS_UP]))
 from config import _ensure_project_root
 
 
