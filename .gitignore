@@ -4,12 +4,16 @@ __pycache__/
 *.pyo
 *.pyd
 *.so
+*.egg-info/
+build/
+dist/
 
-# Virtual environments
+# Environments
 .venv/
 env/
 venv/
 *.env
+.python-version
 
 # Data files
 *.csv
@@ -20,6 +24,12 @@ venv/
 *.h5
 *.sqlite3
 *.db
+
+# Keep csv in /test folder
+!test/testdata.csv
+
+# Jupyter
+.ipynb_checkpoints/
 
 # Ignore all files in data/
 data/**
