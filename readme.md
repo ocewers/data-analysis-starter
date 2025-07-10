@@ -3,9 +3,9 @@
 This is a quick-start boilerplate for data analysis using:
 
 - **[VS Code](https://code.visualstudio.com/)**
-- **[uv](https://github.com/astral-sh/uv)** for package and environment management
+- **[uv](https://docs.astral.sh/uv/)** for package and environment management
 - **Jupyter Notebooks** for exploration
-- **[Data Wrangler](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.vscode-jupyter-datawrangler)** for visual data transformation
+- **[Data Wrangler](https://code.visualstudio.com/docs/datascience/data-wrangler)** for visual data transformation
 
 Everything is configured to work with minimal setup.
 

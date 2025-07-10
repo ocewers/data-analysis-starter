@@ -3,7 +3,7 @@ name = "data-analysis-starter"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.10.3",
     "openpyxl>=3.1.5",
@@ -13,6 +13,4 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "ipykernel>=6.29.5",
-]
+dev = ["ipykernel>=6.29.5"]
