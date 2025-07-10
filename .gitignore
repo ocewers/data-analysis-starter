@@ -36,6 +36,8 @@ tests/**
 # And specific files
 !tests/test_config_file.py
 !tests/test_parse_data.py
+!tests/test_config.py
+!tests/test_bootstrap.py
 
 # Ignore everything inside those subfolders...
 tests/data/**
