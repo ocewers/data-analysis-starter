@@ -72,7 +72,7 @@ code .
 ```
 
 2. VS Code should auto-detect the `.venv` and activate it.
-3. Open the test notebook: `test/test.ipynb`
+3. Open the test notebook: `tests/notebooks/test_setup.ipynb`
 4. Run cells to confirm the environment is working.
 5. Try right-clicking a `DataFrame` output and select **Open in Data Wrangler**.
 
@@ -88,26 +88,25 @@ pytest
 
 This project uses a `config.py` file in the root directory to define key paths using Python's `pathlib`, ensuring compatibility across Windows, macOS, and Linux.
 
-All paths are dynamically resolved, so you can run scripts or notebooks from any directory without needing to adjust file paths manually.
+All paths are dynamically resolved, so you can run scripts or notebooks from any directory without adjusting file paths.
 
-In a notebook below needs to be added for this to work importing TESTS_DIR and OUTPUT_DIR:
+In a notebook, start by running the bootstrap script so Python can locate the `config` module:
 
 ```python
-# Need to run bootstrap.py to set up the environment and enable importing from the config module
+# Initialize paths for the config module
 %run ../../bootstrap.py
 
-# Import the configuration for directories
 from config import TESTS_DIR, OUTPUT_DIR
 ```
 
-And in a py-file you can do the following where SUBDIRECTORY_LEVEL is the number of subdirectories to go up from the current file location to reach the root directory:
+For standalone scripts, add the project root to `sys.path`. Set `ROOT_LEVELS_UP` depending on how deeply the script is nested:
 
 ```python
 import sys
 from pathlib import Path
 
-SUBDIRECTORY_LEVEL = 1  # Adjust this if the structure changes
-sys.path.append(str(Path(__file__).resolve().parents[SUBDIRECTORY_LEVEL]))
+ROOT_LEVELS_UP = 1
+sys.path.append(str(Path(__file__).resolve().parents[ROOT_LEVELS_UP]))
 import config
 ```
 
