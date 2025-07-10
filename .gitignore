@@ -50,15 +50,19 @@ tests/notebooks/**
 
 # Ignore all files in data/
 data/**
+!data/.gitkeep
 
 # Ignore all files in output/
 output/**
+!output/.gitkeep
 
 # Ignore all files in notebooks/
 notebooks/**
+!notebooks/.gitkeep
 
 # Ignore all files in src/
 src/**
+!src/.gitkeep
 
 # Logs
 *.log
