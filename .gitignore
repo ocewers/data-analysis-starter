@@ -7,6 +7,7 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+.pytest_cache/
 
 # Environments
 .venv/
@@ -25,14 +26,39 @@ venv/
 *.sqlite3
 *.db
 
-# Keep csv in /test folder
-!test/testdata.csv
+# Ignore everything in tests/
+tests/**
+
+# But keep specific subfolders
+!tests/data/
+!tests/notebooks/
+
+# And specific files
+!tests/test_config_file.py
+!tests/test_parse_data.py
+
+# Ignore everything inside those subfolders...
+tests/data/**
+tests/notebooks/**
+
+# ...except the allowed files
+!tests/data/testdata.csv
+!tests/notebooks/test_setup.ipynb
 
 # Jupyter
 .ipynb_checkpoints/
 
 # Ignore all files in data/
 data/**
+
+# Ignore all files in output/
+output/**
+
+# Ignore all files in notebooks/
+notebooks/**
+
+# Ignore all files in src/
+src/**
 
 # Logs
 *.log

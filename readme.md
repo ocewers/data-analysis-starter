@@ -76,22 +76,90 @@ code .
 4. Run cells to confirm the environment is working.
 5. Try right-clicking a `DataFrame` output and select **Open in Data Wrangler**.
 
+### Tests
+
+This project includes unit tests to ensure the functionality of the data processing pipeline. Tests are located in the `tests/` directory and are organized by functionality and can be run using the following command:
+
+```sh
+pytest
+```
+
+### 📁 Project Paths and Configuration
+
+This project uses a `config.py` file in the root directory to define key paths using Python's `pathlib`, ensuring compatibility across Windows, macOS, and Linux.
+
+All paths are dynamically resolved, so you can run scripts or notebooks from any directory without needing to adjust file paths manually.
+
+In a notebook below needs to be added for this to work importing TESTS_DIR and OUTPUT_DIR:
+
+```python
+# Need to run bootstrap.py to set up the environment and enable importing from the config module
+%run ../../bootstrap.py
+
+# Import the configuration for directories
+from config import TESTS_DIR, OUTPUT_DIR
+```
+
+And in a py-file you can do the following where SUBDIRECTORY_LEVEL is the number of subdirectories to go up from the current file location to reach the root directory:
+
+```python
+import sys
+from pathlib import Path
+
+SUBDIRECTORY_LEVEL = 1  # Adjust this if the structure changes
+sys.path.append(str(Path(__file__).resolve().parents[SUBDIRECTORY_LEVEL]))
+import config
+```
+
+---
+
+#### 📌 Usage Examples
+
+##### 1. Read a CSV file from the `data/` directory
+
+```python
+import pandas as pd
+from config import DATA_DIR
+
+# Example: ./data/input.csv
+csv_path = DATA_DIR / "input.csv"
+df = pd.read_csv(csv_path)
+
+print(df.head())
+```
+
+##### 2. Read a CSV file from a subdirectory inside data/
+
+```python
+import pandas as pd
+from config import DATA_DIR
+
+# Example: ./data/raw/2025-07-data.csv
+csv_path = DATA_DIR / "raw" / "2025-07-data.csv"
+df = pd.read_csv(csv_path)
+
+print(df.info())
+```
+
 ---
 
 ## 📁 Project Structure
 
 ```text
 .
-├── .vscode/               # VS Code settings for environment + Jupyter
-│   └── settings.json
-├── data/                  # Local data files (ignored in git)
-├── test/                  # Sample notebook and CSV
-│   ├── test.ipynb
-│   └── testdata.csv
+├── .vscode/               # VS Code settings for environment
+├── data/                  # Source data (raw, external, or versioned) content ignored by git
+├── notebooks/             # Jupyter notebooks for exploration, analysis, dev, or documentation
+├── output/                # Generated output and results from code: charts, reports, exports, transformed data
+├── src/                   # Source code for data processing, analysis, and utilities
+├── tests/                 # Contains test files and test notebooks with some test data
+│   ├── data/              # Test data files
+│   └── notebooks/         # Test notebooks
 ├── .gitignore             # Includes .venv, data/, __pycache__, etc.
 ├── .python-version        # Optional version pinning (e.g. for pyenv)
 ├── pyproject.toml         # Project dependencies and metadata
-├── uv.lock                # Exact locked versions
+├── bootstrap.py           # Script for setting up the project environment from notebooks
+├── config.py              # Configuration for paths and directories
 └── README.md
 ```
 
