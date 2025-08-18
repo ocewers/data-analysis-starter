@@ -146,6 +146,7 @@ print(df.info())
 
 ```text
 .
+├── .github/               # GitHub configuration files (e.g. workflows)
 ├── .vscode/               # VS Code settings for environment
 ├── data/                  # Source data (raw, external, or versioned) content ignored by git
 ├── notebooks/             # Jupyter notebooks for exploration, analysis, dev, or documentation
@@ -154,11 +155,12 @@ print(df.info())
 ├── tests/                 # Contains test files and test notebooks with some test data
 │   ├── data/              # Test data files
 │   └── notebooks/         # Test notebooks
+├── utils/                 # Utility scripts and functions
 ├── .gitignore             # Includes .venv, data/, __pycache__, etc.
 ├── .python-version        # Optional version pinning (e.g. for pyenv)
-├── pyproject.toml         # Project dependencies and metadata
 ├── bootstrap.py           # Script for setting up the project environment from notebooks
 ├── config.py              # Configuration for paths and directories
+├── pyproject.toml         # Project dependencies and metadata
 └── README.md
 ```
 
