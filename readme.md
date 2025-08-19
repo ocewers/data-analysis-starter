@@ -50,6 +50,8 @@ git clone https://github.com/ocewers/data-analysis-starter.git
 cd data-analysis-starter
 ```
 
+If you do not have GIT installed to be used in terminal you can also download the repo as a zip-file by pressing the "Code" button and selecting "Download ZIP" here on GitHub.
+
 ### 2. Sync the environment and install dependencies
 
 ```sh
