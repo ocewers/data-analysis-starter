@@ -83,7 +83,7 @@ code .
 This project includes unit tests to ensure the functionality of the data processing pipeline. Tests are located in the `tests/` directory and are organized by functionality and can be run using the following command:
 
 ```sh
-pytest
+uv run pytest
 ```
 
 ### 📁 Project Paths and Configuration
