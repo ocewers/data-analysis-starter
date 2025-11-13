@@ -14,9 +14,11 @@ python pipeline_graph.py --root /path/to/project --out pipeline.mmd
 """
 
 import argparse
+import ast
 import re
+from collections import defaultdict
 from pathlib import Path
-from typing import Set, Tuple
+from typing import Dict, Optional, Sequence, Set, Tuple
 
 import nbformat
 import networkx as nx
@@ -26,6 +28,18 @@ graph LR
     classDef notebook fill:#87CEFA,stroke:#1f4f88,stroke-width:1px,color:#000;
     classDef file fill:#D3D3D3,stroke:#555,stroke-width:1px,color:#000;
 """
+
+BASE_DIR_ALIASES = {
+    "DATA_DIR": "data",
+    "OUTPUT_DIR": "output",
+    "TESTS_DIR": "tests",
+    "NOTEBOOKS_DIR": "notebooks",
+    "SRC_DIR": "src",
+}
+
+READ_METHODS = {"read_csv", "read_parquet", "read_json", "read_excel"}
+WRITE_METHODS = {"to_csv", "to_parquet", "to_json", "to_excel"}
+WRITE_PATH_KEYWORDS = ("path", "path_or_buf")
 
 # ---------------------------------------------------------------------------
 # Regex patterns for I/O – extend as needed
@@ -67,6 +81,7 @@ def analyze_notebook(nb_path: Path) -> Tuple[Set[str], Set[str]]:
     """Return (inputs, outputs) discovered in a notebook."""
     nb = nbformat.read(nb_path, as_version=4)
     inputs, outputs = set(), set()
+    var_sources: Dict[str, Set[str]] = defaultdict(set)
 
     for cell in nb.cells:
         if cell.cell_type != "code":
@@ -74,6 +89,14 @@ def analyze_notebook(nb_path: Path) -> Tuple[Set[str], Set[str]]:
         src = cell.source
         inputs.update(extract_paths(src, READ_PATTERNS))
         outputs.update(extract_paths(src, WRITE_PATTERNS))
+
+        try:
+            tree = ast.parse(src)
+        except SyntaxError:
+            continue
+
+        visitor = DependencyVisitor(var_sources, inputs, outputs)
+        visitor.visit(tree)
 
     # print all inputs and outputs for debugging
     if inputs:
@@ -191,6 +214,198 @@ def main() -> None:
         return
 
     draw_graph_mermaid(graph, args.out)
+
+
+class DependencyVisitor(ast.NodeVisitor):
+    """Track glob-based file usage within a notebook cell."""
+
+    def __init__(
+        self,
+        var_sources: Dict[str, Set[str]],
+        inputs: Set[str],
+        outputs: Set[str],
+    ) -> None:
+        self.var_sources = var_sources
+        self.inputs = inputs
+        self.outputs = outputs
+
+    # ------------------------------------------------------------------
+    # AST helpers
+    # ------------------------------------------------------------------
+    def visit_Assign(self, node: ast.Assign) -> None:  # type: ignore[override]
+        sources = self._sources_from_value(node.value)
+        if sources:
+            for name in self._collect_target_names(node.targets):
+                self.var_sources[name].update(sources)
+        self.generic_visit(node)
+
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> None:  # type: ignore[override]
+        targets = [node.target] if node.target is not None else []
+        sources = self._sources_from_value(node.value) if node.value else set()
+        if sources:
+            for name in self._collect_target_names(targets):
+                self.var_sources[name].update(sources)
+        self.generic_visit(node)
+
+    def visit_For(self, node: ast.For) -> None:  # type: ignore[override]
+        sources = self._sources_from_iter(node.iter)
+        if sources:
+            for name in self._collect_name_targets(node.target):
+                self.var_sources[name].update(sources)
+        self.generic_visit(node)
+
+    def visit_Call(self, node: ast.Call) -> None:  # type: ignore[override]
+        attr = self._call_attr(node.func)
+        if attr in READ_METHODS and node.args:
+            sources = self._resolve_arg_sources(node.args[0])
+            if sources:
+                self.inputs.update(sources)
+        elif attr in WRITE_METHODS:
+            path_expr = self._extract_write_path(node)
+            if path_expr:
+                self.outputs.add(path_expr)
+        self.generic_visit(node)
+
+    # ------------------------------------------------------------------
+    # Extraction helpers
+    # ------------------------------------------------------------------
+    def _sources_from_value(self, value: Optional[ast.AST]) -> Set[str]:
+        if value is None:
+            return set()
+
+        if isinstance(value, ast.Call):
+            glob_sources = self._extract_glob_sources(value)
+            if glob_sources:
+                return glob_sources
+
+        if isinstance(value, ast.Name):
+            return set(self.var_sources.get(value.id, set()))
+
+        return set()
+
+    def _sources_from_iter(self, node: ast.AST) -> Set[str]:
+        if isinstance(node, ast.Name):
+            return set(self.var_sources.get(node.id, set()))
+
+        if isinstance(node, ast.Call):
+            # list(DATA_DIR.glob(...)) style wrappers
+            attr = self._call_attr(node.func)
+            if attr == "list" and node.args:
+                return self._sources_from_iter(node.args[0])
+            return self._extract_glob_sources(node)
+
+        return set()
+
+    def _resolve_arg_sources(self, arg: ast.AST) -> Set[str]:
+        if isinstance(arg, ast.Name):
+            return set(self.var_sources.get(arg.id, set()))
+
+        if isinstance(arg, ast.BinOp):
+            path_str = self._eval_path_expr(arg)
+            if path_str:
+                return {path_str}
+
+        if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+            return {arg.value}
+
+        return set()
+
+    def _extract_write_path(self, node: ast.Call) -> Optional[str]:
+        candidates: Sequence[ast.AST] = []
+        if node.args:
+            candidates = node.args
+        else:
+            keyword_args = [kw.value for kw in node.keywords if kw.arg in WRITE_PATH_KEYWORDS]
+            candidates = keyword_args
+
+        for value in candidates:
+            path = self._eval_path_expr(value)
+            if path:
+                return path
+            if isinstance(value, ast.Name) and value.id in self.var_sources:
+                sources = self.var_sources[value.id]
+                if sources:
+                    return next(iter(sources))
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                return value.value
+        return None
+
+    def _extract_glob_sources(self, call: ast.Call) -> Set[str]:
+        attr = self._call_attr(call.func)
+        if attr != "glob" or not call.args:
+            return set()
+
+        pattern = self._literal_string(call.args[0])
+        if not pattern:
+            return set()
+
+        base_path = self._eval_path_expr(getattr(call.func, "value", None))
+        if base_path:
+            return {str(Path(base_path) / pattern)}
+        return {pattern}
+
+    # ------------------------------------------------------------------
+    # Utility helpers
+    # ------------------------------------------------------------------
+    def _collect_target_names(self, targets: Sequence[ast.AST]) -> Set[str]:
+        names: Set[str] = set()
+        for target in targets:
+            names.update(self._collect_name_targets(target))
+        return names
+
+    def _collect_name_targets(self, target: ast.AST) -> Set[str]:
+        if isinstance(target, ast.Name):
+            return {target.id}
+        if isinstance(target, (ast.Tuple, ast.List)):
+            collected: Set[str] = set()
+            for elt in target.elts:
+                collected.update(self._collect_name_targets(elt))
+            return collected
+        return set()
+
+    def _call_attr(self, func: ast.AST) -> Optional[str]:
+        if isinstance(func, ast.Attribute):
+            return func.attr
+        if isinstance(func, ast.Name):
+            return func.id
+        return None
+
+    def _literal_string(self, node: ast.AST) -> Optional[str]:
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        return None
+
+    def _eval_path_expr(self, node: Optional[ast.AST]) -> Optional[str]:
+        if node is None:
+            return None
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        if isinstance(node, ast.Name):
+            alias = BASE_DIR_ALIASES.get(node.id)
+            if alias:
+                return alias
+            return None
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+            left = self._eval_path_expr(node.left)
+            right = self._eval_path_expr(node.right)
+            if left and right:
+                return str(Path(left) / right)
+            return left or right
+        if isinstance(node, ast.Call):
+            attr = self._call_attr(node.func)
+            if attr == "joinpath" and node.args:
+                base = self._eval_path_expr(getattr(node.func, "value", None))
+                parts = [self._literal_string(arg) for arg in node.args]
+                if base and all(part for part in parts):
+                    path = Path(base)
+                    for part in parts:
+                        path /= str(part)
+                    return str(path)
+        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+            alias = BASE_DIR_ALIASES.get(node.value.id)
+            if alias:
+                return str(Path(alias) / node.attr)
+        return None
 
 
 if __name__ == "__main__":
