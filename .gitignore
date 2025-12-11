@@ -38,6 +38,7 @@ tests/**
 !tests/test_parse_data.py
 !tests/test_config.py
 !tests/test_bootstrap.py
+!tests/test_config_env.py
 
 # Ignore everything inside those subfolders...
 tests/data/**
