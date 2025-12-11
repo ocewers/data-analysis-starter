@@ -20,6 +20,25 @@ This starter template is designed to be **forked into a private repository** whe
 
 ## 🚀 Quick Start: Create Your Team Repository
 
+### Choosing Between Template vs Fork
+
+**Use "Use this template" (Option 1) when:**
+- ✅ You want a **clean, independent repository** with no connection to the original
+- ✅ You're starting a **new project** based on this starter kit
+- ✅ You **don't need updates** from the original template repository
+- ✅ You want a **simpler history** without the original template's commits
+- ✅ **Most teams should use this option** - it's cleaner and easier to manage
+
+**Use "Fork" (Option 2) when:**
+- ✅ You want to **maintain a connection** to the original repository
+- ✅ You plan to **pull updates** from the original template regularly
+- ✅ You might want to **contribute changes back** to the original template
+- ✅ Your organization wants to **track the relationship** to the upstream repository
+
+**💡 Recommendation:** For most data analysis projects, **use the template** (Option 1). Forks are better suited for contributing to open source projects or when you need ongoing synchronization with the upstream repository.
+
+---
+
 ### Option 1: Use This Repository as a Template (Recommended)
 
 1. **Navigate to this repository on GitHub**
