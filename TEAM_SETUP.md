@@ -23,7 +23,8 @@ This starter template is designed to be **forked into a private repository** whe
 ### Option 1: Use This Repository as a Template (Recommended)
 
 1. **Navigate to this repository on GitHub**
-   - Go to: https://github.com/ocewers/data-analysis-starter
+   - If viewing the original template: https://github.com/ocewers/data-analysis-starter
+   - Or navigate to your organization's fork of this template
 
 2. **Click "Use this template"**
    - Click the green "Use this template" button at the top right

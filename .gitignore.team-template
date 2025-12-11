@@ -24,7 +24,8 @@ dist/
 .venv/
 env/
 venv/
-.python-version
+
+# NOTE: .python-version is NOT ignored - commit it to ensure team uses same Python version
 
 # Environment files (contains secrets and local paths)
 *.env

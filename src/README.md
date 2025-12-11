@@ -115,6 +115,8 @@ from pathlib import Path
 # Add src to path
 project_root = Path.cwd()
 while not (project_root / "pyproject.toml").exists():
+    if project_root == project_root.parent:
+        raise FileNotFoundError("Could not find pyproject.toml in any parent directory")
     project_root = project_root.parent
 sys.path.insert(0, str(project_root / "src"))
 
