@@ -12,15 +12,16 @@ def reload_config(monkeypatch):
     """Helper fixture to reload config module with clean state."""
     def _reload(project_root: Path):
         """Reload config module ensuring it picks up new environment variables."""
-        root_str = str(project_root.resolve())
-        if root_str in sys.path:
-            sys.path.remove(root_str)
-        
         import importlib
+        
+        # Use monkeypatch for safer sys.path manipulation
+        root_str = str(project_root.resolve())
+        monkeypatch.syspath_prepend(root_str)
+        
+        # Reload the config module to pick up environment changes
         if 'config' in sys.modules:
             importlib.reload(sys.modules['config'])
         else:
-            sys.path.append(root_str)
             import config
             importlib.reload(config)
         
