@@ -54,18 +54,22 @@ tests/notebooks/**
 # Ignore all files in data/
 data/**
 !data/.gitkeep
+!data/README.md
 
 # Ignore all files in output/
 output/**
 !output/.gitkeep
+!output/README.md
 
 # Ignore all files in notebooks/
 notebooks/**
 !notebooks/.gitkeep
+!notebooks/README.md
 
 # Ignore all files in src/
 src/**
 !src/.gitkeep
+!src/README.md
 
 # Logs
 *.log
