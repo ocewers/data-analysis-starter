@@ -1,0 +1,158 @@
+# Team Repository .gitignore Template
+# Use this .gitignore for your private team repository
+# Copy this file: cp .gitignore.team-template .gitignore
+
+# ============================================================================
+# Python
+# ============================================================================
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# ============================================================================
+# Environments
+# ============================================================================
+
+.venv/
+env/
+venv/
+.python-version
+
+# Environment files (contains secrets and local paths)
+*.env
+.env
+.env.local
+.env.*.local
+
+# BUT keep the example file for documentation
+!.env.example
+
+# ============================================================================
+# Data Files (NEVER commit actual data)
+# ============================================================================
+
+# Common data formats
+*.csv
+*.tsv
+*.xls
+*.xlsx
+*.parquet
+*.h5
+*.hdf5
+*.sqlite3
+*.db
+
+# Ignore all files in data/ directory
+data/**
+!data/.gitkeep
+!data/README.md
+
+# ============================================================================
+# Output Files (Generated content)
+# ============================================================================
+
+# Ignore all files in output/ directory
+output/**
+!output/.gitkeep
+!output/README.md
+
+# Common output formats
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf
+*.svg
+
+# But allow documentation images
+!docs/**/*.png
+!docs/**/*.jpg
+!docs/**/*.jpeg
+!docs/**/*.gif
+!docs/**/*.svg
+
+# ============================================================================
+# Jupyter Notebooks
+# ============================================================================
+
+# Checkpoint files
+.ipynb_checkpoints/
+
+# Jupyter Notebook temporary files
+*.ipynb_temp
+
+# OPTIONAL: Uncomment these lines if you want to clear outputs before committing
+# This keeps the repo size smaller and reduces merge conflicts
+# *.ipynb filter=nbstripout
+
+# ============================================================================
+# VS Code
+# ============================================================================
+
+# VS Code workspace settings (can be committed if team uses same settings)
+# .vscode/
+
+# But always ignore user-specific settings
+.vscode/settings.json
+.vscode/launch.json
+
+# ============================================================================
+# Logs and Temporary Files
+# ============================================================================
+
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================================================
+# Package Manager
+# ============================================================================
+
+# uv lock file (commit this if you want to lock exact versions)
+# uv.lock
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ============================================================================
+# Project-Specific (Customize these for your team)
+# ============================================================================
+
+# Add any project-specific files or patterns below:
+# Examples:
+# secrets/
+# credentials/
+# *.key
+# *.pem
+# config.local.yaml

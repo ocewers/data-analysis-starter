@@ -11,6 +11,20 @@ Everything is configured to work with minimal setup.
 
 ---
 
+## 👥 Using This Template for Team Projects
+
+**Working with a team on sensitive data analysis?** This template is designed to be used as a foundation for your own **private repository** where your team can collaborate safely.
+
+**📘 [Read the Team Collaboration Setup Guide →](TEAM_SETUP.md)**
+
+The guide covers:
+- Creating a private repository from this template
+- What to commit vs. what to keep private
+- Setting up team workflows
+- Security best practices for sensitive data
+
+---
+
 ## ✅ Prerequisites
 
 ### 1. Install VS Code
@@ -43,7 +57,9 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 
 ## 🚀 Clone and Set Up the Project
 
-### 1. Clone this repo
+> **💡 For Team Projects:** If you're setting up a team project with sensitive data, consider [creating a private repository](TEAM_SETUP.md) instead of cloning this public template directly.
+
+### 1. Clone this repo (for individual/learning use)
 
 ```sh
 git clone https://github.com/ocewers/data-analysis-starter.git
@@ -51,6 +67,8 @@ cd data-analysis-starter
 ```
 
 If you do not have GIT installed to be used in terminal you can also download the repo as a zip-file by pressing the "Code" button and selecting "Download ZIP" here on GitHub.
+
+**OR use as a template** by clicking the "Use this template" button on GitHub to create your own repository.
 
 ### 2. Sync the environment and install dependencies
 
