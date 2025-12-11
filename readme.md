@@ -63,6 +63,16 @@ This will:
 - Create a local `.venv`
 - Install all dependencies from `pyproject.toml`
 
+### 3. (Optional) Configure custom paths
+
+If you want to customize directory paths (e.g., use a shared data directory), copy the example environment file:
+
+```sh
+cp .env.example .env
+```
+
+Then edit `.env` to set your custom paths. See the [📁 Project Paths and Configuration](#-project-paths-and-configuration) section for details.
+
 ---
 
 ## 🧭 Open in VS Code
@@ -88,29 +98,83 @@ uv run pytest
 
 ### 📁 Project Paths and Configuration
 
-This project uses a `config.py` file in the root directory to define key paths using Python's `pathlib`, ensuring compatibility across Windows, macOS, and Linux.
+This project uses a flexible path configuration system that supports environment variables, making it easy to customize paths for different environments while maintaining sensible defaults.
 
-All paths are dynamically resolved, so you can run scripts or notebooks from any directory without adjusting file paths.
+#### 🔧 Quick Start
 
-In a notebook, start by running the bootstrap script so Python can locate the `config` module:
+**For Notebooks:**
 
-```python
-# Initialize paths for the config module
-%run ../../bootstrap.py
-
-from config import TESTS_DIR, OUTPUT_DIR
-```
-
-For standalone scripts, add the project root to `sys.path`. Set `ROOT_LEVELS_UP` depending on how deeply the script is nested:
+Simply import the configuration - no bootstrap needed!
 
 ```python
-import sys
-from pathlib import Path
+from config import DATA_DIR, OUTPUT_DIR, TESTS_DIR
 
-ROOT_LEVELS_UP = 1
-sys.path.append(str(Path(__file__).resolve().parents[ROOT_LEVELS_UP]))
-import config
+# Use the paths
+df = pd.read_csv(DATA_DIR / "input.csv")
 ```
+
+**For Scripts:**
+
+Just import config directly:
+
+```python
+from config import DATA_DIR, OUTPUT_DIR
+
+# Use the paths
+df = pd.read_csv(DATA_DIR / "input.csv")
+```
+
+The project root is automatically detected by finding `pyproject.toml`, and all paths are dynamically resolved for cross-platform compatibility (Windows, macOS, Linux).
+
+#### 🎛️ Advanced: Customizing Paths with Environment Variables
+
+You can customize directory paths using environment variables. This is useful for:
+- Using shared data directories across multiple projects
+- Separating output directories by environment (dev/prod)
+- Working with data stored on external drives or network locations
+
+**Option 1: Using a `.env` file (Recommended for development)**
+
+1. Copy the example file:
+   ```sh
+   cp .env.example .env
+   ```
+
+2. Edit `.env` and set your custom paths:
+   ```sh
+   # Use absolute paths
+   DATA_DIR=/mnt/shared/project-data
+   OUTPUT_DIR=/mnt/output/analysis-results
+   
+   # Or relative paths (relative to project root)
+   DATA_DIR=my_data
+   OUTPUT_DIR=my_output
+   ```
+
+3. The paths will be automatically loaded when you import config
+
+**Option 2: Setting environment variables directly**
+
+```sh
+# Linux/macOS
+export DATA_DIR=/path/to/data
+export OUTPUT_DIR=/path/to/output
+
+# Windows (PowerShell)
+$env:DATA_DIR="C:\path\to\data"
+$env:OUTPUT_DIR="C:\path\to\output"
+```
+
+**Available Environment Variables:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PROJECT_ROOT` | Auto-detected | Project root directory (usually not needed) |
+| `DATA_DIR` | `{PROJECT_ROOT}/data` | Directory for source data files |
+| `OUTPUT_DIR` | `{PROJECT_ROOT}/output` | Directory for generated outputs |
+| `NOTEBOOKS_DIR` | `{PROJECT_ROOT}/notebooks` | Directory for Jupyter notebooks |
+| `SRC_DIR` | `{PROJECT_ROOT}/src` | Directory for source code |
+| `TESTS_DIR` | `{PROJECT_ROOT}/tests` | Directory for tests |
 
 ---
 
@@ -141,6 +205,35 @@ df = pd.read_csv(csv_path)
 
 print(df.info())
 ```
+
+##### 3. Using custom paths via environment variables
+
+```python
+# If you set DATA_DIR=/mnt/shared/datasets in your .env file
+# or export DATA_DIR=/mnt/shared/datasets
+
+import pandas as pd
+from config import DATA_DIR
+
+# This will use /mnt/shared/datasets/input.csv
+csv_path = DATA_DIR / "input.csv"
+df = pd.read_csv(csv_path)
+```
+
+#### 🔄 Backward Compatibility
+
+For existing code that uses `bootstrap.py` or manual `sys.path` manipulation, everything still works:
+
+```python
+# Old approach (still supported)
+%run ../../bootstrap.py
+from config import DATA_DIR
+
+# New approach (simpler)
+from config import DATA_DIR
+```
+
+Both work! The project automatically handles path setup.
 
 ---
 
