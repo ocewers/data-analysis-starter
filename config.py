@@ -40,6 +40,21 @@ def _ensure_project_root(marker: str = "pyproject.toml") -> Path:
     return root
 
 
+# ✅ Find and set up project root first (before anything else)
+PROJECT_ROOT = _ensure_project_root()
+
+# Try to load .env file if python-dotenv is available
+try:
+    from dotenv import load_dotenv
+    # Look for .env file in project root
+    dotenv_path = PROJECT_ROOT / ".env"
+    if dotenv_path.exists():
+        load_dotenv(dotenv_path)
+except ImportError:
+    # python-dotenv not installed, skip .env file loading
+    pass
+
+
 def _get_path_from_env(env_var: str, default_relative: str) -> Path:
     """
     Get a directory path from environment variable or use default relative to project root.
@@ -62,21 +77,6 @@ def _get_path_from_env(env_var: str, default_relative: str) -> Path:
     # Use default relative to project root
     return PROJECT_ROOT / default_relative
 
-
-# Try to load .env file if python-dotenv is available
-try:
-    from dotenv import load_dotenv
-    # Look for .env file in project root
-    dotenv_path = _find_project_root() / ".env"
-    if dotenv_path.exists():
-        load_dotenv(dotenv_path)
-except ImportError:
-    # python-dotenv not installed, skip .env file loading
-    pass
-
-
-# ✅ Automatically inject root into sys.path every time config.py is imported
-PROJECT_ROOT = _ensure_project_root()
 
 # Base folders - can be overridden by environment variables
 DATA_DIR = _get_path_from_env("DATA_DIR", "data")
